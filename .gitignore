@@ -1,0 +1,10 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore environment files
+.env
+
+# Ignore training data and outputs
+training_data_prepared.jsonl
+training_data_prepared_prepared.jsonl
