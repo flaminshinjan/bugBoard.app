@@ -2,8 +2,7 @@
 __pycache__/
 *.py[cod]
 
-# Ignore environment files
-.env
+
 
 # Ignore training data and outputs
 training_data_prepared.jsonl
