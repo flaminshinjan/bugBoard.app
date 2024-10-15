@@ -1,0 +1,7 @@
+<mitigation text> ||| <bug overview text>
+
+Implement input validation to prevent buffer overflows ||| Buffer overflow attacks are possible if input validation is not properly implemented, allowing attackers to send oversized inputs that can overwrite memory and execute arbitrary code or crash the system.
+
+Sanitize user inputs to prevent SQL injection vulnerabilities ||| Without input sanitization, attackers can inject malicious SQL commands into the database query, leading to unauthorized access, data corruption, or complete database compromise.
+
+Use HTTPS to secure data transmission ||| Using HTTP instead of HTTPS exposes data transmission to interception by attackers, leading to potential data breaches, man-in-the-middle attacks, and loss of sensitive information such as passwords or private keys.
