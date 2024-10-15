@@ -11,7 +11,14 @@ import networkx as nx  # For generating complex graphs
 load_dotenv()
 
 # Set your OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    print("API key not loaded!")
+else:
+    print(f"API key loaded: {api_key}")
+
+# Set your OpenAI API key
+openai.api_key = api_key
 
 # Function to generate a bug overview using OpenAI ChatCompletion API
 def generate_bug_overview(mitigation_text):
