@@ -13,49 +13,42 @@ load_dotenv()
 # Set your OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Function to generate a bug overview using OpenAI API
+# Function to generate a bug overview using OpenAI API (new API)
 def generate_bug_overview(mitigation_text):
-    messages = [
-        {"role": "system", "content": "You are an expert software engineer."},
-        {"role": "user", "content": (
-            f"Given the following mitigations, provide a comprehensive bug overview.\n\n"
-            f"Mitigations:\n{mitigation_text}\n\nBug Overview:"
-        )}
-    ]
+    prompt = (
+        f"Given the following mitigations, provide a comprehensive bug overview.\n\n"
+        f"Mitigations:\n{mitigation_text}\n\nBug Overview:"
+    )
     
-    response = openai.ChatCompletion.create(
+    response = openai.completions.create(
         model="gpt-4",  # Replace this with your fine-tuned model if available
-        messages=messages,
+        prompt=prompt,
         max_tokens=500,
         temperature=0.7,
     )
     
-    bug_overview = response.choices[0].message['content'].strip()
+    bug_overview = response.choices[0].text.strip()  # Access the result directly from the 'text'
     return bug_overview
 
-# Function to generate code change analysis using OpenAI API
+# Function to generate code change analysis using OpenAI API (new API)
 def analyze_code(code_snippet, programming_language):
-    messages = [
-        {"role": "system", "content": f"You are an expert {programming_language} developer."},
-        {"role": "user", "content": (
-            "Analyze the following code for bugs and potential issues. Provide a detailed list of bugs, "
-            f"security vulnerabilities, and any improvements that can be made.\n\n"
-            f"Code:\n{code_snippet}\n\nAnalysis:"
-        )}
-    ]
+    prompt = (
+        f"Analyze the following {programming_language} code for bugs and potential issues. Provide a detailed list of bugs, "
+        f"security vulnerabilities, and any improvements that can be made.\n\n"
+        f"Code:\n{code_snippet}\n\nAnalysis:"
+    )
     
-    response = openai.ChatCompletion.create(
+    response = openai.completions.create(
         model="gpt-4",  # Replace this with your fine-tuned model if available
-        messages=messages,
+        prompt=prompt,
         max_tokens=750,
         temperature=0.7,
     )
     
-    analysis = response.choices[0].message['content'].strip()
+    analysis = response.choices[0].text.strip()  # Access the result directly from the 'text'
     return analysis
 
 # Function to generate a complex graph showing actual code changes
-# Function to generate a complex graph showing actual code changes with improved layout
 def generate_complex_code_change_graph(code_changes, bug_overview, mitigations):
     # Create a directed graph using NetworkX
     G = nx.DiGraph()
@@ -93,7 +86,6 @@ def generate_complex_code_change_graph(code_changes, bug_overview, mitigations):
 
     # Return the figure for rendering
     return plt
-
 
 # Streamlit UI
 st.set_page_config(page_title="BugBoard - Squash Bugs in Style!", layout="centered")
