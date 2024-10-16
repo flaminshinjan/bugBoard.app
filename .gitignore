@@ -7,3 +7,4 @@ __pycache__/
 # Ignore training data and outputs
 training_data_prepared.jsonl
 training_data_prepared_prepared.jsonl
+.env
