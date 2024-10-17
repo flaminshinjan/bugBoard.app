@@ -45,25 +45,28 @@ def generate_bug_overview(mitigation_text):
     return bug_overview
 
 # Function to generate code change analysis using OpenAI ChatCompletion API
+# Function to generate code change analysis using OpenAI ChatCompletion API
 def analyze_code(code_snippet, programming_language):
     messages = [
         {"role": "system", "content": f"You are an expert {programming_language} developer."},
         {"role": "user", "content": (
-            f"Analyze the following {programming_language} code for bugs and potential issues. Provide a detailed list of bugs, "
-            f"security vulnerabilities, and any improvements that can be made.\n\n"
-            f"Code:\n{code_snippet}\n\nAnalysis:"
+            f"Analyze the following {programming_language} code for bugs and potential issues. "
+            f"Provide a detailed list of bugs, security vulnerabilities, and improvements that can be made.\n\n"
+            f"Code:\n{code_snippet}\n\n"
+            f"Once you've analyzed the code, rewrite the code with the necessary improvements applied. "
+            f"Ensure the revised code follows best practices and is free of the issues you identified."
         )}
     ]
     
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=messages,
-        max_tokens=750,
+        max_tokens=1000,  # Increased to allow room for the revised code
         temperature=0.7,
     )
     
-    analysis = response.choices[0].message['content'].strip()
-    return analysis
+    analysis_and_fix = response.choices[0].message['content'].strip()
+    return analysis_and_fix
 
 # Function to generate a complex graph showing actual code changes
 def generate_complex_code_change_graph(code_changes, bug_overview, mitigations):
