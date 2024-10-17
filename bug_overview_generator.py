@@ -1,7 +1,12 @@
 # streamlit_bug_overview.py
 
+import streamlit as st  # Streamlit must be imported before calling set_page_config
+
+# Set the page config as the first command in the script
+st.set_page_config(page_title="BugBoard - Squash Bugs in Style!", layout="centered")
+
+# Now import the rest of the libraries
 import openai
-import streamlit as st
 import os
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
@@ -13,9 +18,8 @@ load_dotenv()
 # Set your OpenAI API key
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    print("API key not loaded!")
-else:
-    print(f"API key loaded: {api_key}")
+    st.error("API key not loaded! Please check your environment variables.")
+
 
 # Set your OpenAI API key
 openai.api_key = api_key
@@ -30,8 +34,8 @@ def generate_bug_overview(mitigation_text):
         )}
     ]
     
-    response = openai.ChatCompletion.create(  # Correct method for chat models
-        model="gpt-4",  # Replace this with your fine-tuned model if available
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
         messages=messages,
         max_tokens=500,
         temperature=0.7,
@@ -51,8 +55,8 @@ def analyze_code(code_snippet, programming_language):
         )}
     ]
     
-    response = openai.ChatCompletion.create(  # Correct method for chat models
-        model="gpt-4",  # Replace this with your fine-tuned model if available
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
         messages=messages,
         max_tokens=750,
         temperature=0.7,
@@ -89,46 +93,45 @@ def generate_complex_code_change_graph(code_changes, bug_overview, mitigations):
     plt.figure(figsize=(10, 8))
     
     # Draw the graph with customized settings
-    nx.draw(G, pos, with_labels=True, node_color='lightgreen', node_size=4000, font_size=10, font_weight='bold', arrows=True, edge_color='black')
+    nx.draw(G, pos, with_labels=True, node_color='#76c7c0', node_size=4000, font_size=12, font_weight='bold', arrows=True, edge_color='#ff6b6b')
     
     # Add labels with improved positioning
     labels = nx.get_node_attributes(G, 'label')
-    nx.draw_networkx_labels(G, pos, labels, font_size=9, font_color='black', verticalalignment='bottom')
+    nx.draw_networkx_labels(G, pos, labels, font_size=10, font_color='#2f3136', verticalalignment='bottom')
 
-    plt.title("BugBoard: Cycle of Code Changes, Bug Fixes, and Mitigations")
+    plt.title("BugBoard: Cycle of Code Changes, Bug Fixes, and Mitigations", fontsize=16, color='#ffffff')
 
     # Return the figure for rendering
     return plt
 
-# Streamlit UI
-st.set_page_config(page_title="BugBoard - Squash Bugs in Style!", layout="centered")
-st.markdown("""
-    <style>
+# Define CSS for Dark Mode and Light Mode
+dark_theme_css = """
+<style>
     body {
-        background-color: #202124;
+        background-color: #2f3136;
         color: white;
     }
     .css-18e3th9 {
-        background-color: #202124 !important;
+        background-color: #2f3136 !important;
     }
     .css-1d391kg p {
         color: white;
     }
     .css-15tx938 {
-        background-color: #202124;
+        background-color: #2f3136;
         color: white;
         border-radius: 8px;
         border: 1px solid #434343;
     }
     .stTextArea, .stTextInput {
-        background-color: #292b2e;
+        background-color: #3c4043;
         color: white;
         border-radius: 8px;
-        border: 1px solid #565656;
+        border: 1px solid #676a6d;
         padding: 10px;
     }
     .stButton button {
-        background-color: #ff5656;
+        background-color: #ff6b6b;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -139,17 +142,17 @@ st.markdown("""
         transition: background-color 0.3s ease;
     }
     .stButton button:hover {
-        background-color: #ff4c4c;
+        background-color: #fa5252;
     }
     .css-164nlkn {
-        background-color: #292b2e !important;
+        background-color: #3c4043 !important;
         color: white;
     }
     .css-1d391kg h1, .css-1d391kg h2 {
         color: white;
     }
     .css-1v3fvcr {
-        background-color: #1f1f1f;
+        background-color: #3c4043;
         border: 1px solid #434343;
         padding: 20px;
         border-radius: 10px;
@@ -162,11 +165,11 @@ st.markdown("""
         font-size: 18px;
     }
     .stTabs [data-baseweb="tab-list"] button[data-highlighted="true"] {
-        border-bottom: 3px solid #ff5656;
-        color: #ff5656;
+        border-bottom: 3px solid #ff6b6b;
+        color: #ff6b6b;
     }
     .stTabs [data-baseweb="tab-list"] button:hover {
-        color: #ff5656;
+        color: #ff6b6b;
     }
     .output-bubble {
         background-color: #3a3b3c;
@@ -179,21 +182,80 @@ st.markdown("""
         width: 100%;
         word-wrap: break-word;
     }
-    </style>
-""", unsafe_allow_html=True)
+    .graph-container {
+        background-color: #2f3136;
+        border-radius: 10px;
+        padding: 10px;
+        border: 2px solid #565656;
+    }
+    .header-title {
+        color: #76c7c0;
+        font-weight: bold;
+    }
+    .chat-bubble {
+        background-color: #3a3b3c;
+        color: white;
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        word-wrap: break-word;
+        border: 1px solid #434343;
+        font-size: 14px;
+    }
+</style>
+"""
 
-# Streamlit UI for BugBoard
+# Session state to toggle between themes
+if "theme" not in st.session_state:
+    st.session_state["theme"] = "dark"
+
+# Button to toggle between dark and light theme
+if st.button("Toggle Dark/Light Mode"):
+    if st.session_state["theme"] == "dark":
+        st.session_state["theme"] = "light"
+    else:
+        st.session_state["theme"] = "dark"
+
+# Apply the selected theme
+if st.session_state["theme"] == "dark":
+    st.markdown(dark_theme_css, unsafe_allow_html=True)
+else:
+    st.markdown(light_theme_css, unsafe_allow_html=True)
+
+# Initialize session state for chat history
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
+
+# Streamlit sidebar to display chat history in bubbles
+st.sidebar.header("🗂️ Chat History")
+if st.session_state["chat_history"]:
+    for idx, chat in enumerate(st.session_state["chat_history"]):
+        st.sidebar.markdown(f'<div class="chat-bubble"><b>Entry {idx + 1}:</b> {chat}</div>', unsafe_allow_html=True)
+else:
+    st.sidebar.write("No chat history yet. Your bug-busting adventures will appear here!")
+
+# Streamlit UI for BugBoard with tabs
 st.title("🛠️ BugBoard - Let's Squash Those Bugs!")
 
-st.write("""
-Welcome to **BugBoard** where bug squashing meets fun! Enter your code changes, mitigations, and let the magic happen! 🎯
-""")
+# Instructions
+with st.expander("📖 How to Use BugBoard"):
+    st.write("""
+    1. Enter a bug mitigation strategy or a code snippet.
+    2. Click '💥 Hit Me with Bug Overview and Code Fixes' to generate a bug overview, code analysis, and visualize changes.
+    3. View results in the generated sections below.
+    """)
+
+# Tabs for different functionalities
+tab1, tab2, tab3 = st.tabs(["🐞 Bug Overview", "🔍 Code Analysis", "📊 Graph Visualization"])
 
 # Text input for entering the mitigation
-mitigation_input = st.text_area("Enter Your Bug-Busting Strategy 🐞:", placeholder="Tell us how you'll squash that bug!", height=150)
+mitigation_input = st.text_area("🛡️ Enter Your Bug-Busting Strategy:", placeholder="Tell us how you'll squash that bug!", height=150)
 
 # Text input for entering code snippet for analysis
-code_input = st.text_area("Paste Your Battle Code 🛠️:", placeholder="Drop your code snippet here...", height=150)
+code_input = st.text_area("🛠️ Paste Your Battle Code:", placeholder="Drop your code snippet here...", height=150)
+
+# Add more user-friendly controls
+st.slider("🔧 Confidence Level (Higher is more verbose):", 0, 100, 70)
 
 # Fun button to trigger the bug overview, code analysis, and complex graph generation
 if st.button("💥 Hit Me with Bug Overview and Code Fixes"):
@@ -210,14 +272,17 @@ if st.button("💥 Hit Me with Bug Overview and Code Fixes"):
                 code_analysis = analyze_code(code_input, "Python")
                 st.success("🛠️ Code Analysis Complete!")
 
-                # Display bug overview and code analysis in two columns
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown(f"#### Bug Breakdown 🕵️")
+                # Store in chat history
+                st.session_state["chat_history"].append(f"Bug Overview: {bug_overview[:50]}... | Code Analysis: {code_analysis[:50]}...")
+
+                # Show bug overview in the first tab
+                with tab1:
+                    st.markdown(f"#### Bug Breakdown 🕵️", unsafe_allow_html=True)
                     st.markdown(f'<div class="output-bubble">{bug_overview}</div>', unsafe_allow_html=True)
                 
-                with col2:
-                    st.markdown(f"#### Code Review 🔍")
+                # Show code analysis in the second tab
+                with tab2:
+                    st.markdown(f"#### Code Review 🔍", unsafe_allow_html=True)
                     st.markdown(f'<div class="output-bubble">{code_analysis}</div>', unsafe_allow_html=True)
 
                 # Simulate code changes for the graph
@@ -230,10 +295,11 @@ if st.button("💥 Hit Me with Bug Overview and Code Fixes"):
                     "Mitigation: Using parameterized queries for secure DB access."
                 ]
 
-                # Display the complex graph below the two columns
-                st.write("### 🚀 Visualizing Your Code Changes and Mitigations in BugBoard:")
-                fig = generate_complex_code_change_graph(code_changes, bug_overview, mitigations)
-                st.pyplot(fig)
+                # Show the graph in the third tab
+                with tab3:
+                    st.markdown(f'<h3 class="header-title">🚀 Visualizing Your Code Changes and Mitigations in BugBoard:</h3>', unsafe_allow_html=True)
+                    fig = generate_complex_code_change_graph(code_changes, bug_overview, mitigations)
+                    st.pyplot(fig)
 
             except Exception as e:
                 st.error(f"💥 Oops, something went wrong: {str(e)}")
