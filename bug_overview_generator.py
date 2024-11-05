@@ -35,7 +35,7 @@ def generate_bug_overview(mitigation_text):
     ]
     
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=messages,
         max_tokens=500,
         temperature=0.7,
